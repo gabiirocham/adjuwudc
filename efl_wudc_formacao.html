@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adjudicando como EFL — WUDC</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:  #EFEBE3;
+  --cream2: #E8E4DB;
+  --navy:   #064262;
+  --navy2:  #053550;
+  --teal:   #0B4349;
+  --mid1:   #A9BEC3;
+  --mid2:   #5A858E;
+  --mid3:   #929D90;
+  --mid4:   #5B7772;
+  --white:  #ffffff;
+  --text:   #1a2a2a;
+  --muted:  #5A858E;
+  --border: rgba(6,66,98,0.1);
+  --border2:rgba(6,66,98,0.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--cream);color:var(--text);font-family:'Poppins',sans-serif;font-size:14px;line-height:1.7;display:flex;min-height:100vh;overflow-x:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:252px;flex-shrink:0;background:var(--navy);position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;z-index:10}
+.sidebar-head{padding:30px 22px 22px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-eyebrow{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mid1);margin-bottom:8px}
+.sidebar-title{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--cream);line-height:1.05;letter-spacing:.04em}
+.sidebar-title span{color:var(--mid1)}
+.sidebar-nav{padding:14px 0 28px;flex:1}
+.nav-group{margin-bottom:2px}
+.nav-group-label{font-size:8.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:14px 22px 4px;display:block}
+.nav-link{display:flex;align-items:center;gap:10px;padding:8px 22px;font-size:12.5px;font-weight:400;color:rgba(255,255,255,.55);text-decoration:none;transition:all .15s;border-left:2px solid transparent;cursor:pointer;user-select:none}
+.nav-link:hover{color:var(--cream);background:rgba(255,255,255,.05)}
+.nav-link.active{color:var(--cream);border-left-color:var(--mid1);background:rgba(255,255,255,.07);font-weight:500}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.45;flex-shrink:0}
+.nav-sub{padding:5px 22px 5px 38px;font-size:12px;color:rgba(255,255,255,.35);text-decoration:none;display:block;cursor:pointer;transition:color .15s;user-select:none}
+.nav-sub:hover,.nav-sub.active{color:var(--mid1)}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0}
+.section{display:none}
+.section.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PAGE HEADER ── */
+.page-header{background:var(--teal);padding:52px 56px 44px;position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;right:-60px;top:-80px;width:340px;height:340px;border-radius:50%;border:70px solid rgba(255,255,255,.03)}
+.page-header::after{content:'';position:absolute;right:60px;bottom:-100px;width:200px;height:200px;border-radius:50%;border:50px solid rgba(255,255,255,.03)}
+.page-eyebrow{font-size:9.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mid1);margin-bottom:10px}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:.04em;color:var(--cream);line-height:1;margin-bottom:14px}
+.page-subtitle{font-size:13.5px;font-weight:300;color:rgba(239,235,227,.72);max-width:540px;line-height:1.7}
+
+/* ── CONTENT ── */
+.content{padding:44px 56px 64px}
+
+/* ── SUB NAV ── */
+.sub-nav{display:flex;gap:0;border-bottom:1.5px solid rgba(6,66,98,.13);margin-bottom:32px;overflow-x:auto}
+.sub-btn{font-family:'Poppins',sans-serif;font-size:12px;font-weight:500;padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:-1.5px;white-space:nowrap;letter-spacing:.02em}
+.sub-btn:hover{color:var(--navy)}
+.sub-btn.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:600}
+.sub-panel{display:none}
+.sub-panel.active{display:block;animation:fadeUp .2s ease}
+
+/* ── COMPONENTS ── */
+.sec-label{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:block}
+
+.card{background:var(--white);border-radius:12px;border:1px solid var(--border);padding:24px 28px;margin-bottom:16px;transition:box-shadow .2s}
+.card:hover{box-shadow:0 4px 20px rgba(6,66,98,.07)}
+
+.hl{border-left:3px solid var(--navy);background:rgba(6,66,98,.05);border-radius:0 8px 8px 0;padding:13px 17px;font-size:13px;line-height:1.7;color:var(--text);margin-bottom:18px}
+.hl.teal{border-left-color:var(--teal);background:rgba(11,67,73,.05)}
+.hl.mid{border-left-color:var(--mid2);background:rgba(90,133,142,.07)}
+
+.callout{border-radius:10px;padding:13px 17px;font-size:13px;line-height:1.7;margin-bottom:18px}
+.callout.navy{background:rgba(6,66,98,.07);color:var(--navy)}
+.callout.teal{background:rgba(11,67,73,.07);color:var(--teal)}
+
+.tip{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;font-size:13px;color:var(--text);line-height:1.7}
+.tip:last-child{margin-bottom:0}
+.tip-dot{width:6px;height:6px;border-radius:50%;background:var(--navy);margin-top:8px;flex-shrink:0}
+.tip-dot.t{background:var(--teal)}
+.tip-dot.m{background:var(--mid2)}
+.tip-dot.g{background:var(--mid4)}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.info-card{background:var(--white);border-radius:10px;border:1px solid var(--border);padding:18px 20px}
+.info-card-label{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.info-card p{font-size:13px;line-height:1.65;color:var(--text)}
+
+.divider{height:1px;background:rgba(6,66,98,.09);margin:22px 0}
+
+/* ── MANIFESTO ── */
+.manifesto{background:var(--navy);border-radius:14px;padding:30px 34px;margin-bottom:24px;position:relative;overflow:hidden}
+.manifesto::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;border:50px solid rgba(255,255,255,.03)}
+.manifesto-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:var(--cream);margin-bottom:14px}
+.manifesto-body{font-size:13.5px;font-weight:300;color:rgba(239,235,227,.8);line-height:1.8}
+.manifesto-body strong{font-weight:600;color:var(--cream)}
+
+/* ── MANUAL BUTTON ── */
+.manual-btn{display:inline-flex;align-items:center;gap:10px;margin-top:20px;padding:12px 22px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:var(--cream);font-size:13px;font-weight:500;text-decoration:none;transition:all .2s;cursor:pointer}
+.manual-btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);transform:translateY(-1px)}
+.manual-btn svg{flex-shrink:0;opacity:.8}
+
+/* ── INTRO STATS ── */
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.stat-card{background:var(--white);border-radius:10px;border:1px solid var(--border);padding:20px 22px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;right:-12px;bottom:-12px;width:60px;height:60px;border-radius:50%;background:rgba(6,66,98,.04)}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--navy);line-height:1;margin-bottom:5px;letter-spacing:.02em}
+.stat-label{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* ── SHEET ── */
+.sheet-outer{background:rgba(6,66,98,.04);border-radius:12px;padding:12px;margin-bottom:18px;border:1px solid var(--border)}
+.sheet{background:var(--white);border-radius:8px;overflow:hidden;border:1px solid rgba(6,66,98,.12)}
+.sheet-head{display:grid;grid-template-columns:1fr 1fr 1fr 1fr}
+.sh{padding:9px 10px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.08em;text-align:center;border-right:1px solid rgba(255,255,255,.18)}
+.sh:last-child{border-right:none}
+.sh-og{background:var(--navy);color:var(--cream)}
+.sh-oo{background:var(--teal);color:var(--cream)}
+.sh-cg{background:var(--mid2);color:var(--cream)}
+.sh-co{background:var(--mid4);color:var(--cream)}
+.sheet-body{display:grid;grid-template-columns:1fr 1fr 1fr 1fr}
+.sb-col{border-right:1px solid rgba(6,66,98,.07)}
+.sb-col:last-child{border-right:none}
+.sb-sec{border-bottom:1px solid rgba(6,66,98,.07);padding:8px 10px}
+.sb-sec:last-child{border-bottom:none}
+.sb-lbl{font-size:8px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.sb-line{height:15px;border-bottom:1px dashed rgba(6,66,98,.11);margin-bottom:3px;font-size:10px;color:rgba(6,66,98,.28);font-style:italic;display:flex;align-items:flex-end;padding-bottom:1px}
+
+/* ── SYMBOLS ── */
+.sym-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px;margin-bottom:18px}
+.sym-card{background:var(--white);border:1px solid var(--border);border-radius:9px;padding:11px 13px;display:flex;align-items:flex-start;gap:11px;transition:box-shadow .15s}
+.sym-card:hover{box-shadow:0 3px 12px rgba(6,66,98,.09)}
+.sym-char{font-family:'Bebas Neue',monospace;font-size:24px;color:var(--navy);min-width:22px;line-height:1;margin-top:1px}
+.sym-desc{font-size:12px;color:var(--text);line-height:1.5}
+
+/* ── COLOR CODING ── */
+.clash-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.clash-row{display:flex;align-items:center;gap:14px;background:var(--white);border-radius:10px;padding:13px 16px;border:1px solid var(--border);font-size:13px;color:var(--text);line-height:1.55;transition:box-shadow .15s}
+.clash-row:hover{box-shadow:0 3px 12px rgba(6,66,98,.08)}
+.clash-swatch{width:32px;height:22px;border-radius:5px;flex-shrink:0;border:1px solid rgba(0,0,0,.07)}
+
+/* ── DISPLACEMENT ── */
+.disp-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:18px}
+.team-pills{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+.team-pill{text-align:center;padding:9px 6px;border-radius:8px;font-size:12px;font-weight:600;letter-spacing:.02em;transition:all .2s}
+.pill-og{background:rgba(6,66,98,.09);color:var(--navy)}
+.pill-oo{background:rgba(11,67,73,.09);color:var(--teal)}
+.pill-cg{background:rgba(90,133,142,.12);color:var(--mid2)}
+.pill-co{background:rgba(91,119,114,.12);color:var(--mid4)}
+.axis-outer{position:relative;height:36px;margin:8px 0 5px}
+.axis-track{position:absolute;top:50%;left:0;right:0;height:2px;background:rgba(6,66,98,.1);transform:translateY(-50%);border-radius:2px}
+.axis-zero{position:absolute;top:0;height:36px;width:1.5px;background:rgba(6,66,98,.28);transform:translateX(-50%)}
+.axis-seg{position:absolute;top:50%;height:8px;transform:translateY(-50%);border-radius:3px;transition:all .35s cubic-bezier(.4,0,.2,1);opacity:.75}
+.axis-mk{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:var(--mid2);border:2.5px solid var(--white);box-shadow:0 2px 8px rgba(6,66,98,.2);transform:translate(-50%,-50%);transition:all .35s cubic-bezier(.4,0,.2,1)}
+.axis-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:5px}
+
+/* ── SLIDERS ── */
+.sliders{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.sl-row{display:flex;align-items:center;gap:12px}
+.sl-tag{font-size:10.5px;font-weight:600;padding:4px 10px;border-radius:6px;min-width:32px;text-align:center;letter-spacing:.02em;flex-shrink:0}
+.sl-track{flex:1;position:relative;height:20px;display:flex;align-items:center;cursor:pointer}
+.sl-track input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:rgba(6,66,98,.12);outline:none;cursor:pointer}
+.sl-track input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--navy);border:3px solid var(--white);box-shadow:0 2px 6px rgba(6,66,98,.25);cursor:grab;transition:transform .15s}
+.sl-track input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2);cursor:grabbing}
+.sl-track input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--navy);border:3px solid var(--white);box-shadow:0 2px 6px rgba(6,66,98,.25);cursor:grab}
+.sl-val{font-size:13px;font-weight:600;color:var(--navy);min-width:24px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:18px}
+
+.rank-box{background:rgba(6,66,98,.04);border-radius:10px;padding:14px 18px;margin-top:18px;border:1px solid var(--border2)}
+.rank-box-label{font-size:8.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.rank-chips{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.rank-chip{font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;transition:all .2s}
+.rank-sep{font-size:13px;color:var(--mid1);font-weight:300}
+
+/* ── STEP FLOW ── */
+.step-flow{display:flex;flex-direction:column;gap:0;margin-bottom:18px;position:relative}
+.step-flow::before{content:'';position:absolute;left:12px;top:26px;bottom:26px;width:1.5px;background:rgba(6,66,98,.1)}
+.step-item{display:flex;gap:16px;align-items:flex-start;padding:10px 0}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--navy);color:var(--cream);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;position:relative;z-index:1}
+.step-text{font-size:13px;color:var(--text);line-height:1.7;padding-top:3px}
+.step-text strong{font-weight:600;color:var(--navy)}
+
+/* ── OA FLOW ── */
+.oa-section{background:var(--white);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;transition:box-shadow .2s}
+.oa-section:hover{box-shadow:0 4px 18px rgba(6,66,98,.08)}
+.oa-header{padding:14px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none}
+.oa-badge{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.06em;padding:4px 12px;border-radius:5px;flex-shrink:0}
+.oa-header-title{font-size:13.5px;font-weight:500;color:var(--text);flex:1}
+.oa-arrow{font-size:12px;color:var(--muted);transition:transform .2s;flex-shrink:0}
+.oa-body{padding:0 20px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease}
+.oa-body.open{max-height:400px;padding:0 20px 16px}
+.oa-body .tip{font-size:13px}
+.oa-comparativas{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.oa-comp-row{display:flex;align-items:center;gap:8px;background:rgba(6,66,98,.03);border-radius:7px;padding:8px 12px;font-size:12.5px;color:var(--text)}
+.comp-vs{font-size:10px;font-weight:600;color:var(--muted);background:rgba(6,66,98,.07);padding:2px 8px;border-radius:4px;letter-spacing:.04em}
+
+/* ── CHECKLIST ── */
+.chk-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.chk-list li{display:flex;align-items:flex-start;gap:11px;font-size:13px;color:var(--text);line-height:1.65}
+.chk-icon{font-size:13px;margin-top:2px;flex-shrink:0;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px}
+.ok{background:rgba(16,105,60,.1);color:#10693c}
+.no{background:rgba(180,30,30,.09);color:#b41e1e}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(6,66,98,.15);border-radius:3px}
+</style>
+</head>
+<body>
+
+<nav class="sidebar" aria-label="Navegação principal">
+  <div class="sidebar-head">
+    <div class="sidebar-eyebrow">WUDC · EFL Judging</div>
+    <div class="sidebar-title">Adjudicando<br><span>como EFL</span></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group">
+      <span class="nav-group-label">Início</span>
+      <div class="nav-link active" onclick="goTo('intro')"><span class="nav-dot"></span>Introdução</div>
+    </div>
+    <div class="nav-group">
+      <span class="nav-group-label">Debate ao vivo</span>
+      <div class="nav-link" onclick="goTo('comp')"><span class="nav-dot"></span>Compreensão ativa</div>
+      <div class="nav-link" onclick="goTo('cog')"><span class="nav-dot"></span>Gestão cognitiva</div>
+      <div class="nav-link" onclick="goTo('nota')"><span class="nav-dot"></span>Folha de anotação</div>
+      <div class="nav-link" onclick="goTo('sym')"><span class="nav-dot"></span>Sistema de símbolos</div>
+      <div class="nav-link" onclick="goTo('color')"><span class="nav-dot"></span>Color coding de clash</div>
+    </div>
+    <div class="nav-group">
+      <span class="nav-group-label">Adjudicação</span>
+      <div class="nav-link" onclick="goTo('desl')"><span class="nav-dot"></span>Modelo de deslocamento</div>
+      <div class="nav-link" onclick="goTo('wing')"><span class="nav-dot"></span>Como ser um bom wing</div>
+      <div class="nav-link" onclick="goTo('chair')"><span class="nav-dot"></span>Como ser um bom chair</div>
+      <div class="nav-link" onclick="goTo('oa')"><span class="nav-dot"></span>Adjudicação oral</div>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- ══════════════════════════════════════════
+     INTRODUÇÃO
+══════════════════════════════════════════ -->
+<div class="section active" id="intro">
+  <div class="page-header">
+    <div class="page-eyebrow">Módulo 0 · Por que essa formação existe</div>
+    <div class="page-title">Adjudicando como EFL</div>
+    <div class="page-subtitle">Ferramentas concretas para juízes EFL se tornarem adjudicadores mais confiantes, precisos e valiosos para qualquer painel.</div>
+  </div>
+  <div class="content">
+
+    <div class="manifesto">
+      <div class="manifesto-title">Por que essa formação existe</div>
+      <div class="manifesto-body">
+        Formações tradicionais de adjudicação no BP assumem que todos os juízes processam inglês com a mesma velocidade. <strong>Não processam.</strong><br><br>
+        Para um juiz EFL, a compreensão e a maximização das habilidades do adjudicador exigem etapas cognitivas adicionais que formações genéricas simplesmente ignoram.<br><br>
+        <strong>Essa formação existe para dar a você ferramentas</strong> de anotação, de gestão de atenção, de análise e de avaliação que compensam esse custo e te tornam um adjudicador mais confiante.
+      </div>
+      <a class="manual-btn" href="https://wudc.info/resources" target="_blank" rel="noopener">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Acessar o Manual WUDC oficial
+      </a>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-num">4</div>
+        <div class="stat-label">bancadas para acompanhar simultaneamente em um debate BP</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">8</div>
+        <div class="stat-label">speakers com papéis diferentes, cada um a ser avaliado individualmente</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">~7min</div>
+        <div class="stat-label">por fala para capturar argumentos, rebates, impacto e cumprimento de papel</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">+1</div>
+        <div class="stat-label">etapa cognitiva extra para cada juiz EFL em relação a nativos</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="info-card">
+        <div class="info-card-label">Ao vivo no debate</div>
+        <p>Compreensão ativa · Gestão cognitiva · Folha de anotação por bancada · Sistema de símbolos · Color coding de clash</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Na deliberação e na OA</div>
+        <p>Modelo de deslocamento · Como ser um bom wing · Como ser um bom chair · Estrutura da adjudicação oral</p>
+      </div>
+    </div>
+
+    <div class="hl">
+      <strong>Premissa fundamental:</strong> ser EFL não limita sua capacidade analítica. Limita sua velocidade de processamento. Ferramentas certas eliminam essa diferença.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     COMPREENSÃO ATIVA
+══════════════════════════════════════════ -->
+<div class="section" id="comp">
+  <div class="page-header">
+    <div class="page-eyebrow">Módulo 1 · Debate ao vivo</div>
+    <div class="page-title">Compreensão ativa</div>
+    <div class="page-subtitle">Estratégias para extrair o máximo das falas mesmo quando a velocidade ou o sotaque tornam a escuta difícil.</div>
+  </div>
+  <div class="content">
+    <div class="callout teal"><strong>Princípio central:</strong> você não consegue ouvir e anotar ao mesmo tempo com igual qualidade. Escolha ouvir — anote menos, entenda mais.</div>
+
+    <div class="two-col">
+      <div class="info-card">
+        <div class="info-card-label">Sinalizadores de estrutura</div>
+        <p style="font-style:italic;font-size:12px;color:var(--muted)">"I'll make two arguments..."<br>"First… Second…"<br>"My role today is to..."<br>"We define this motion as..."</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Sinalizadores de clash</div>
+        <p style="font-style:italic;font-size:12px;color:var(--muted)">"They said X, but..."<br>"This fails because..."<br>"The response to this is..."<br>"Even if X, still Y..."</p>
+      </div>
+    </div>
+
+    <span class="sec-label">Técnicas de escuta</span>
+    <div class="card">
+      <div class="tip"><div class="tip-dot"></div><div><strong>Primeiros 30 segundos:</strong> debatedores mais experientes anunciam a estrutura no início. Priorize a atenção nesse momento — capturar o mapa da fala facilita todo o restante.</div></div>
+      <div class="tip"><div class="tip-dot t"></div><div>Quando você perder um trecho, <strong>não entre em pânico tentando reconstruir.</strong> Volte ao presente. É melhor capturar o restante bem do que perder tudo.</div></div>
+      <div class="tip"><div class="tip-dot m"></div><div><strong>Deixe espaço em branco</strong> nas notas quando não entendeu. Ao final, decida com o contexto se é possível inferir — se não, descarte. Argumento não compreendido não pesa.</div></div>
+      <div class="tip"><div class="tip-dot g"></div><div>Nos <strong>15 segundos de transição</strong> entre falas, releia as notas da bancada anterior e circule o argumento mais forte. Isso mantém o mapa mental atualizado sem custo de atenção durante as falas.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     GESTÃO COGNITIVA
+══════════════════════════════════════════ -->
+<div class="section" id="cog">
+  <div class="page-header">
+    <div class="page-eyebrow">Módulo 2 · Debate ao vivo</div>
+    <div class="page-title">Gestão cognitiva</div>
+    <div class="page-subtitle">Como distribuir atenção, usar memória e estruturar sua análise antes de entrar na deliberação.</div>
+  </div>
+  <div class="content">
+    <div class="callout navy"><strong>Sua atenção é um recurso escasso.</strong> Gaste-a nos momentos de maior valor analítico: sinalizadores de clash e rebates diretos entre bancadas.</div>
+
+    <div class="two-col">
+      <div class="info-card">
+        <div class="info-card-label">Durante as falas</div>
+        <p>Escuta ativa + anotação mínima. Prioridade: ouvir. Anote uma palavra-chave e a direção do argumento — não a frase inteira.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Entre falas e na deliberação</div>
+        <p>Análise ativa com as notas. Nunca misture os dois modos — anotar durante análise e analisar durante escuta fragmentam os dois.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tip"><div class="tip-dot"></div><div>Na deliberação, <strong>confie na memória para textura, use as notas para estrutura.</strong> Você lembra mais do que as notas mostram — as duas fontes juntas reconstroem o debate.</div></div>
+      <div class="tip"><div class="tip-dot t"></div><div>Ao final do debate, antes de entrar na deliberação, <strong>releia todas as suas notas em 2 minutos de silêncio.</strong> Forme uma posição provisória de ranking antes de ouvir os outros juízes.</div></div>
+      <div class="tip"><div class="tip-dot m"></div><div>Se você percebeu que não entendeu algo importante, <strong>diga isso na deliberação.</strong> "Não ficou claro para mim o que OG quis dizer com X — vocês entenderam?" é contribuição válida, não fraqueza.</div></div>
+      <div class="tip"><div class="tip-dot g"></div><div>Anotar demais fragmenta a atenção. Uma palavra-chave bem escolhida <strong>ancora a memória</strong> sem exigir transcrição.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     FOLHA DE ANOTAÇÃO
+══════════════════════════════════════════ -->
+<div class="section" id="nota">
+  <div class="page-header">
+    <div class="page-eyebrow">Módulo 3 · Debate ao vivo</div>
+    <div class="page-title">Folha de anotação</div>
+    <div class="page-subtitle">Sistema de registro estruturado por bancada, com rastreamento de rebates cruzados e espaço para speakers.</div>
+  </div>
+  <div class="content">
+    <div class="sheet-outer">
+      <div class="sheet">
+        <div class="sheet-head">
+          <div class="sh sh-og">OG</div>
+          <div class="sh sh-oo">OO</div>
+          <div class="sh sh-cg">CG</div>
+          <div class="sh sh-co">CO</div>
+        </div>
+        <div class="sheet-body">
+          <div class="sb-col">
+            <div class="sb-sec">
+              <div class="sb-lbl">Speakers</div>
+              <div class="sb-line">PM: ___</div>
+              <div class="sb-line">DPM: ___</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Definição / enquadramento</div>
+              <div class="sb-line">def:</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Arg 1</div>
+              <div class="sb-line">mec:</div>
+              <div class="sb-line">imp:</div>
+              <div class="sb-line">rebate por:</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Arg 2</div>
+              <div class="sb-line">mec:</div>
+              <div class="sb-line">imp:</div>
+              <div class="sb-line">rebate por:</div>
+            </div>
+          </div>
+          <div class="sb-col">
+            <div class="sb-sec">
+              <div class="sb-lbl">Speakers</div>
+              <div class="sb-line">LO: ___</div>
+              <div class="sb-line">DLO: ___</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Rebate OG</div>
+              <div class="sb-line">arg1:</div>
+              <div class="sb-line">arg2:</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Arg 1 próprio</div>
+              <div class="sb-line">mec:</div>
+              <div class="sb-line">imp:</div>
+              <div class="sb-line">rebate por:</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Arg 2 próprio</div>
+              <div class="sb-line">mec:</div>
+              <div class="sb-line">imp:</div>
+              <div class="sb-line">rebate por:</div>
+            </div>
+          </div>
+          <div class="sb-col">
+            <div class="sb-sec">
+              <div class="sb-lbl">Speakers</div>
+              <div class="sb-line">MG: ___</div>
+              <div class="sb-line">GW: ___</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Extensão genuína?</div>
+              <div class="sb-line">nova? S/N:</div>
+              <div class="sb-line">conteúdo:</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Rebate OO</div>
+              <div class="sb-line">arg1 OO:</div>
+              <div class="sb-line">arg2 OO:</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Novo arg</div>
+              <div class="sb-line">mec:</div>
+              <div class="sb-line">imp:</div>
+            </div>
+          </div>
+          <div class="sb-col">
+            <div class="sb-sec">
+              <div class="sb-lbl">Speakers</div>
+              <div class="sb-line">MO: ___</div>
+              <div class="sb-line">OW: ___</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Extensão genuína?</div>
+              <div class="sb-line">nova? S/N:</div>
+              <div class="sb-line">conteúdo:</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Rebate CG</div>
+              <div class="sb-line">ext CG:</div>
+              <div class="sb-line">arg CG:</div>
+            </div>
+            <div class="sb-sec">
+              <div class="sb-lbl">Whip</div>
+              <div class="sb-line">clash central:</div>
+              <div class="sb-line">por que opp ganhou:</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="tip"><div class="tip-dot"></div><div>A linha <strong>"rebate por:"</strong> em cada argumento é para registrar qual bancada respondeu aquele ponto — fundamental para as comparativas cronológicas na deliberação.</div></div>
+      <div class="tip"><div class="tip-dot t"></div><div>A seção <strong>"extensão genuína?"</strong> de CG e CO força você a avaliar no momento se o argumento é novo ou repetição — isso evita discussão longa sobre esse ponto na deliberação.</div></div>
+      <div class="tip"><div class="tip-dot m"></div><div>Os campos de speakers acima de cada coluna são para anotar a pontuação ao final — um por debatedor, na coluna da sua bancada.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SÍMBOLOS
+══════════════════════════════════════════ -->
+<div class="section" id="sym">
+  <div class="page-header">
+    <div class="page-eyebrow">Módulo 4 · Debate ao vivo</div>
+    <div class="page-title">Sistema de símbolos</div>
+    <div class="page-subtitle">Símbolos substituem frases inteiras e liberam atenção para ouvir em vez de escrever.</div>
+  </div>
+  <div class="content">
+    <div class="hl">Use <strong>palavras-chave em português + símbolos.</strong> "mec. incent." em duas palavras vale mais do que copiar a frase exata do debatedor. O objetivo é capturar o argumento, não transcrevê-lo.</div>
+
+    <div class="sym-grid">
+      <div class="sym-card"><span class="sym-char">↑</span><span class="sym-desc">argumento a favor da bancada</span></div>
+      <div class="sym-card"><span class="sym-char">↓</span><span class="sym-desc">rebate / argumento contra</span></div>
+      <div class="sym-card"><span class="sym-char">→</span><span class="sym-desc">resposta direta a ponto anterior</span></div>
+      <div class="sym-card"><span class="sym-char">!</span><span class="sym-desc">argumento forte / impactante</span></div>
+      <div class="sym-card"><span class="sym-char">?</span><span class="sym-desc">não compreendido — não pesa</span></div>
+      <div class="sym-card"><span class="sym-char">=</span><span class="sym-desc">repetição de ponto já feito</span></div>
+      <div class="sym-card"><span class="sym-char">✗</span><span class="sym-desc">ponto ignorado, sem resposta</span></div>
+      <div class="sym-card"><span class="sym-char">~</span><span class="sym-desc">análise vaga, não desenvolvida</span></div>
+      <div class="sym-card"><span class="sym-char">#</span><span class="sym-desc">extensão genuína (CG / CO)</span></div>
+      <div class="sym-card"><span class="sym-char">◎</span><span class="sym-desc">argumento mais forte da fala</span></div>
+    </div>
+
+    <div class="card">
+      <div class="tip"><div class="tip-dot"></div><div>Ao final de cada fala, <strong>circule (◎) o argumento mais forte</strong> daquela bancada. Na deliberação, esses círculos são sua âncora analítica.</div></div>
+      <div class="tip"><div class="tip-dot t"></div><div>O símbolo <strong>✗</strong> (ponto sem resposta) é um dos mais importantes. Pontos não rebatidos tendem a permanecer em pé e deslocam o adjudicador.</div></div>
+      <div class="tip"><div class="tip-dot m"></div><div>Crie seus próprios símbolos para conceitos que aparecem frequentemente nas suas moções. Consistência pessoal supera sistema universal.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     COLOR CODING
+══════════════════════════════════════════ -->
+<div class="section" id="color">
+  <div class="page-header">
+    <div class="page-eyebrow">Módulo 5 · Debate ao vivo</div>
+    <div class="page-title">Color coding de clash</div>
+    <div class="page-subtitle">Use cores padrão de marca-texto para conectar visualmente todos os argumentos e rebates do mesmo clash nas quatro colunas.</div>
+  </div>
+  <div class="content">
+    <div class="callout navy"><strong>Princípio:</strong> mesma cor = mesmo clash, em qualquer coluna. Na deliberação, você vê de uma olhada quem avançou mais em cada clash — e quais pontos ficaram sem resposta.</div>
+
+    <span class="sec-label">Sistema de cores sugerido</span>
+    <div class="clash-list">
+      <div class="clash-row"><div class="clash-swatch" style="background:#FFFF00"></div><strong>Amarelo —</strong> Clash 1: clash central da moção, onde os lados mais diretamente discordam.</div>
+      <div class="clash-row"><div class="clash-swatch" style="background:#90EE90"></div><strong>Verde —</strong> Clash 2: segundo eixo de disputa ou extensão de bancada fechada que gerou debate próprio.</div>
+      <div class="clash-row"><div class="clash-swatch" style="background:#FF9999"></div><strong>Rosa/Laranja —</strong> Clash 3: terceiro clash identificado, geralmente ligado a extensões de CG ou CO.</div>
+      <div class="clash-row"><div class="clash-swatch" style="background:#ADD8E6"></div><strong>Azul —</strong> Clash 4 (se houver): quarto eixo de disputa em debates mais complexos.</div>
+      <div class="clash-row"><div class="clash-swatch" style="background:#D3D3D3"></div><strong>Sem marca —</strong> Pontos isolados sem resposta direta. Permanecem em pé e deslocam o adjudicador.</div>
+    </div>
+
+    <div class="card">
+      <div class="tip"><div class="tip-dot"></div><div>Quando OG faz arg1 (amarelo), OO responde (amarelo), CG retoma (amarelo) — tudo fica visualmente conectado. Você vê de uma olhada <strong>quem avançou mais em cada clash.</strong></div></div>
+      <div class="tip"><div class="tip-dot t"></div><div>Não se preocupe em identificar todos os clashes antes do debate. Marque na cor <strong>conforme surgem.</strong> Se dois pontos claramente se respondem, mesma cor. Se isolados, sem marca.</div></div>
+      <div class="tip"><div class="tip-dot m"></div><div>Pontos sem marca são frequentemente <strong>subestimados.</strong> Ninguém os derrubou. Na comparativa, eles deslocam o adjudicador e precisam ser contabilizados.</div></div>
+      <div class="tip"><div class="tip-dot g"></div><div>Na deliberação: "no clash amarelo, OG iniciou, OO respondeu parcialmente (✗ segundo ponto de OG), CG retomou com extensão genuína. OG > OO nesse clash; CG contribuiu positivamente."</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     DESLOCAMENTO
+══════════════════════════════════════════ -->
+<div class="section" id="desl">
+  <div class="page-header">
+    <div class="page-eyebrow">Módulo 6 · Adjudicação</div>
+    <div class="page-title">Modelo de deslocamento</div>
+    <div class="page-subtitle">O adjudicador começa no ponto zero. Cada argumento não rebatido o empurra. O ranking é ordenado pela magnitude de deslocamento de cada bancada.</div>
+  </div>
+  <div class="content">
+    <div class="hl"><strong>Ganha quem deslocou mais</strong> — não quem falou mais, não quem foi mais eloquente. Se OG desloca +4 e OO desloca −3, mas CG desloca apenas +1, o resultado é OG > OO > CG mesmo Gov ganhando.</div>
+
+    <div class="disp-card">
+      <div class="team-pills">
+        <div class="team-pill pill-og" id="tp-og">OG · 0</div>
+        <div class="team-pill pill-oo" id="tp-oo">OO · 0</div>
+        <div class="team-pill pill-cg" id="tp-cg">CG · 0</div>
+        <div class="team-pill pill-co" id="tp-co">CO · 0</div>
+      </div>
+
+      <div class="axis-outer" id="axouter">
+        <div class="axis-track"></div>
+        <div class="axis-zero" id="azero"></div>
+        <div class="axis-seg" id="seg-og" style="background:#064262"></div>
+        <div class="axis-seg" id="seg-oo" style="background:#0B4349"></div>
+        <div class="axis-seg" id="seg-cg" style="background:#5A858E"></div>
+        <div class="axis-seg" id="seg-co" style="background:#929D90"></div>
+        <div class="axis-mk" id="amk"></div>
+      </div>
+      <div class="axis-lbl"><span>← Gov (positivo)</span><span>0</span><span>Opp (negativo) →</span></div>
+
+      <div class="sliders">
+        <div class="sl-row">
+          <span class="sl-tag" style="background:rgba(6,66,98,.1);color:#064262">OG</span>
+          <div class="sl-track"><input type="range" min="-5" max="5" value="0" id="sl-og" step="1"></div>
+          <span class="sl-val" id="sv-og">0</span>
+        </div>
+        <div class="sl-row">
+          <span class="sl-tag" style="background:rgba(11,67,73,.1);color:#0B4349">OO</span>
+          <div class="sl-track"><input type="range" min="-5" max="5" value="0" id="sl-oo" step="1"></div>
+          <span class="sl-val" id="sv-oo">0</span>
+        </div>
+        <div class="sl-row">
+          <span class="sl-tag" style="background:rgba(90,133,142,.12);color:#5A858E">CG</span>
+          <div class="sl-track"><input type="range" min="-5" max="5" value="0" id="sl-cg" step="1"></div>
+          <span class="sl-val" id="sv-cg">0</span>
+        </div>
+        <div class="sl-row">
+          <span class="sl-tag" style="background:rgba(91,119,114,.12);color:#5B7772">CO</span>
+          <div class="sl-track"><input type="range" min="-5" max="5" value="0" id="sl-co" step="1"></div>
+          <span class="sl-val" id="sv-co">0</span>
+        </div>
+      </div>
+
+      <div class="rank-box">
+        <div class="rank-box-label">Ranking por magnitude de deslocamento</div>
+        <div class="rank-chips" id="rchips"></div>
+      </div>
+    </div>
+
+    <span class="sec-label">Peso dos argumentos</span>
+    <div class="card">
+      <div class="tip"><div class="tip-dot"></div><div><strong>Deslocamento alto:</strong> argumento com mecanismo claro + impacto desenvolvido + exemplo concreto + não rebatido.</div></div>
+      <div class="tip"><div class="tip-dot t"></div><div><strong>Deslocamento médio:</strong> mecanismo razoável, impacto mencionado mas não desenvolvido, parcialmente rebatido.</div></div>
+      <div class="tip"><div class="tip-dot m"></div><div><strong>Deslocamento baixo:</strong> assertiva declarada sem análise, apenas repetida, rebatida com eficácia.</div></div>
+      <div class="tip"><div class="tip-dot g"></div><div><strong>Deslocamento zero:</strong> argumento não compreendido, irrelevante à moção, ou completamente derrubado sem resposta.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     WING
+══════════════════════════════════════════ -->
+<div class="section" id="wing">
+  <div class="page-header">
+    <div class="page-eyebrow">Módulo 7 · Adjudicação</div>
+    <div class="page-title">Como ser um bom wing</div>
+    <div class="page-subtitle">Como wing, você não é espectador — é um tomador de decisão com voz igual na deliberação. Sua análise importa tanto quanto a do chair.</div>
+  </div>
+  <div class="content">
+    <div class="callout navy">Avaliações boas como wing vêm de chairs que sentiram que você <strong>contribuiu genuinamente</strong> para a qualidade da decisão e da OA — não de wings que concordaram com tudo.</div>
+
+    <span class="sec-label">Na deliberação</span>
+    <div class="card">
+      <div class="tip"><div class="tip-dot"></div><div><strong>Forme sua opinião antes da deliberação.</strong> Chegar sem uma posição provoca indecisão e torna você vulnerável a ser arrastado pelo chair.</div></div>
+      <div class="tip"><div class="tip-dot t"></div><div>Se você discorda do chair, <strong>diga isso com clareza e embase.</strong> "Eu rankeei diferente porque o clash principal foi X, e CG ganhou esse clash" é contribuição válida e valiosa.</div></div>
+      <div class="tip"><div class="tip-dot m"></div><div>Não capitule por educação. Ser EFL não significa que sua leitura é menos válida. A diversidade de perspectivas é <strong>precisamente a razão de existir painel.</strong></div></div>
+      <div class="tip"><div class="tip-dot g"></div><div>Aprenda a diferenciar <strong>"concordo com o ranking"</strong> de <strong>"concordo com a análise".</strong> Você pode rankear igual ao chair e ainda contribuir com uma leitura diferente do debate.</div></div>
+    </div>
+
+    <span class="sec-label">O que chairs valorizam em wings</span>
+    <ul class="chk-list">
+      <li><span class="chk-icon ok">✓</span><span>Formou uma opinião clara e provisória antes da deliberação</span></li>
+      <li><span class="chk-icon ok">✓</span><span>Expressou discordâncias com fundamentos, não com insegurança</span></li>
+      <li><span class="chk-icon ok">✓</span><span>Ofereceu análise específica de argumentos e rebates</span></li>
+      <li><span class="chk-icon ok">✓</span><span>Contribuiu com leituras de speakers que o chair não havia considerado</span></li>
+      <li><span class="chk-icon ok">✓</span><span>Não prolongou a deliberação desnecessariamente com pontos menores</span></li>
+      <li><span class="chk-icon ok">✓</span><span>Perguntou ao chair se havia algo útil para ele antes da OA</span></li>
+      <li><span class="chk-icon no">✗</span><span>Ficou quieto e concordou com tudo o que o chair disse</span></li>
+      <li><span class="chk-icon no">✗</span><span>Cedeu ao chair sem genuinamente concordar</span></li>
+      <li><span class="chk-icon no">✗</span><span>Não deu feedback direto aos debatedores quando a OA abriu espaço</span></li>
+      <li><span class="chk-icon no">✗</span><span>Insistiu em um ponto menor que não mudava o resultado final</span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     CHAIR
+══════════════════════════════════════════ -->
+<div class="section" id="chair">
+  <div class="page-header">
+    <div class="page-eyebrow">Módulo 8 · Adjudicação</div>
+    <div class="page-title">Como ser um bom chair</div>
+    <div class="page-subtitle">O chair não é o juiz principal — é o facilitador da decisão coletiva e porta-voz do painel.</div>
+  </div>
+  <div class="content">
+    <div class="callout teal">A qualidade das avaliações que você recebe dos seus wings depende diretamente de <strong>como você os trata durante a deliberação.</strong></div>
+
+    <span class="sec-label">Conduzindo a deliberação</span>
+    <div class="card">
+      <div class="tip"><div class="tip-dot"></div><div>Abra a deliberação pedindo que <strong>cada wing compartilhe seu ranking provisório primeiro</strong> — isso evita que sua opinião domine antes que todos se expressem.</div></div>
+      <div class="tip"><div class="tip-dot t"></div><div>Quando um wing discorda, <strong>leve a sério antes de rebater.</strong> Pergunte "o que você viu que eu não vi?" — isso produz deliberações melhores e avaliações mais altas.</div></div>
+      <div class="tip"><div class="tip-dot m"></div><div>Se um wing está silencioso, <strong>chame-o diretamente:</strong> "O que você achou do rebate de CO ao ponto de OG sobre X?" Perguntas específicas produzem contribuições melhores do que perguntas abertas.</div></div>
+      <div class="tip"><div class="tip-dot g"></div><div><strong>Sintetize a deliberação antes de sair:</strong> "Concordamos que OG > CG > OO > CO — decidimos por maioria porque..." Registro claro evita confusão na OA.</div></div>
+    </div>
+
+    <span class="sec-label">O que wings valorizam em chairs</span>
+    <ul class="chk-list">
+      <li><span class="chk-icon ok">✓</span><span>Pediu o ranking de cada wing antes de apresentar o próprio</span></li>
+      <li><span class="chk-icon ok">✓</span><span>Ouviu discordâncias sem defensividade e atualizou posição quando pertinente</span></li>
+      <li><span class="chk-icon ok">✓</span><span>Estruturou a deliberação com eficiência sem ser ditatorial</span></li>
+      <li><span class="chk-icon ok">✓</span><span>Deu espaço real para cada wing contribuir na OA</span></li>
+      <li><span class="chk-icon ok">✓</span><span>Foi respeitoso e inclusivo, especialmente com EFLs menos experientes</span></li>
+      <li><span class="chk-icon no">✗</span><span>Dominou a deliberação sem deixar espaço para os wings</span></li>
+      <li><span class="chk-icon no">✗</span><span>Ignorou ou minimizou análises dos wings que divergiam</span></li>
+      <li><span class="chk-icon no">✗</span><span>Apresentou a decisão como "minha" em vez de "do painel"</span></li>
+      <li><span class="chk-icon no">✗</span><span>Usou jargão técnico para silenciar wings menos experientes</span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     OA
+══════════════════════════════════════════ -->
+<div class="section" id="oa">
+  <div class="page-header">
+    <div class="page-eyebrow">Módulo 9 · Adjudicação</div>
+    <div class="page-title">Adjudicação oral</div>
+    <div class="page-subtitle">A OA segue ordem cronológica: caso de OG → caso de OO → comparativa OG/OO → caso de CG → comparativas CG/OG e CG/OO → caso de CO → comparativas CO com todas as bancadas.</div>
+  </div>
+  <div class="content">
+    <div class="callout navy"><strong>Regra fundamental:</strong> anuncie o ranking imediatamente. Em seguida, percorra o debate na ordem em que aconteceu — cada bancada é apresentada e comparada apenas com quem falou antes dela.</div>
+
+    <span class="sec-label">Estrutura cronológica da OA</span>
+
+    <div class="oa-section">
+      <div class="oa-header" onclick="toggleOA(this)">
+        <span class="oa-badge" style="background:rgba(6,66,98,.1);color:#064262">OG</span>
+        <span class="oa-header-title">Caso de Opening Government</span>
+        <span class="oa-arrow">▼</span>
+      </div>
+      <div class="oa-body open">
+        <div class="tip"><div class="tip-dot"></div><div>Apresente o caso de OG: o que argumentaram, como definiram a moção e quais foram seus argumentos principais.</div></div>
+        <div class="tip"><div class="tip-dot t"></div><div>Avalie a qualidade do caso de OG de forma isolada — sem ainda compará-la a OO. Esta é a base do debate.</div></div>
+      </div>
+    </div>
+
+    <div class="oa-section">
+      <div class="oa-header" onclick="toggleOA(this)">
+        <span class="oa-badge" style="background:rgba(11,67,73,.1);color:#0B4349">OO</span>
+        <span class="oa-header-title">Caso de Opening Opposition</span>
+        <span class="oa-arrow">▼</span>
+      </div>
+      <div class="oa-body open">
+        <div class="tip"><div class="tip-dot"></div><div>Apresente o caso de OO: como rebateram OG e quais argumentos próprios trouxeram.</div></div>
+        <div class="tip"><div class="tip-dot t"></div><div>Avalie a qualidade do rebate de OO ao caso de OG — o que responderam bem, o que deixaram em pé.</div></div>
+        <div class="oa-comparativas">
+          <div class="oa-comp-row">
+            <span class="comp-vs">OG vs OO</span>
+            Explique quem ganhou o clash da abertura e por quê — qual bancada deslocou mais o adjudicador nessa fase do debate.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oa-section">
+      <div class="oa-header" onclick="toggleOA(this)">
+        <span class="oa-badge" style="background:rgba(90,133,142,.12);color:#5A858E">CG</span>
+        <span class="oa-header-title">Caso de Closing Government</span>
+        <span class="oa-arrow">▼</span>
+      </div>
+      <div class="oa-body open">
+        <div class="tip"><div class="tip-dot"></div><div>Apresente o caso de CG: qual extensão trouxeram e como se diferenciaram de OG.</div></div>
+        <div class="tip"><div class="tip-dot t"></div><div>Avalie se a extensão foi genuinamente nova ou repetição — e o quanto ela contribuiu para o lado gov.</div></div>
+        <div class="oa-comparativas">
+          <div class="oa-comp-row">
+            <span class="comp-vs">CG vs OG</span>
+            CG deslocou mais do que OG? A extensão foi mais poderosa que o caso de abertura, ou OG seguiu sendo mais relevante?
+          </div>
+          <div class="oa-comp-row">
+            <span class="comp-vs">CG vs OO</span>
+            CG deslocou mais do que OO? O impacto da extensão de CG foi maior do que o caso de OO?
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oa-section">
+      <div class="oa-header" onclick="toggleOA(this)">
+        <span class="oa-badge" style="background:rgba(91,119,114,.12);color:#5B7772">CO</span>
+        <span class="oa-header-title">Caso de Closing Opposition</span>
+        <span class="oa-arrow">▼</span>
+      </div>
+      <div class="oa-body open">
+        <div class="tip"><div class="tip-dot"></div><div>Apresente o caso de CO: qual extensão trouxeram, como responderam a CG e como o whip sintetizou o debate.</div></div>
+        <div class="tip"><div class="tip-dot t"></div><div>CO tinha a responsabilidade de engajar com tudo que foi dito antes — avalie se cumpriram esse papel.</div></div>
+        <div class="oa-comparativas">
+          <div class="oa-comp-row">
+            <span class="comp-vs">CO vs OO</span>
+            CO deslocou mais do que OO? A extensão e o whip de CO foram mais impactantes que o caso de OO?
+          </div>
+          <div class="oa-comp-row">
+            <span class="comp-vs">CO vs OG</span>
+            CO deslocou mais do que OG? O total da contribuição de CO supera o caso de OG?
+          </div>
+          <div class="oa-comp-row">
+            <span class="comp-vs">CO vs CG</span>
+            CO deslocou mais do que CG? A extensão de CO foi mais relevante que a de CG?
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <span class="sec-label">Dicas de linguagem para EFLs</span>
+    <div class="card">
+      <div class="tip"><div class="tip-dot"></div><div>Priorize <strong>clareza sobre sofisticação.</strong> Uma OA em inglês simples e claro é melhor do que uma cheia de jargão confuso.</div></div>
+      <div class="tip"><div class="tip-dot t"></div><div>Use "o painel sentiu que..." ou "o que nos convenceu foi..." — isso mostra raciocínio coletivo, não veredito unilateral.</div></div>
+      <div class="tip"><div class="tip-dot m"></div><div>Se não entendeu um argumento, não invente crítica. É mais honesto dizer "esse ponto não ficou claro para o painel e por isso não pesou na decisão."</div></div>
+      <div class="tip"><div class="tip-dot g"></div><div>Uma OA de qualidade dura entre <strong>8 e 12 minutos.</strong> Menos do que isso tende a ser rasa; mais do que isso cansa os debatedores.</div></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+/* ── NAVIGATION ── */
+function goTo(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-link, .nav-sub').forEach(a => a.classList.remove('active'));
+  const sec = document.getElementById(id);
+  if (sec) sec.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(a => {
+    if (a.getAttribute('onclick') === `goTo('${id}')`) a.classList.add('active');
+  });
+  window.scrollTo(0,0);
+}
+
+/* ── OA ACCORDION ── */
+function toggleOA(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.oa-arrow');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+document.querySelectorAll('.oa-arrow').forEach(a => { a.style.transform = 'rotate(180deg)'; });
+
+/* ── DISPLACEMENT ── */
+const TEAMS = ['og','oo','cg','co'];
+const LABELS = {og:'OG',oo:'OO',cg:'CG',co:'CO'};
+const COLORS = {og:'#064262',oo:'#0B4349',cg:'#5A858E',co:'#929D90'};
+const CHIP_BG = {og:'rgba(6,66,98,.1)',oo:'rgba(11,67,73,.1)',cg:'rgba(90,133,142,.14)',co:'rgba(91,119,114,.14)'};
+const CHIP_CL = {og:'#064262',oo:'#0B4349',cg:'#5A858E',co:'#5B7772'};
+
+function updateDisp() {
+  const vals = {};
+  TEAMS.forEach(id => {
+    const v = parseInt(document.getElementById('sl-'+id).value);
+    vals[id] = v;
+    document.getElementById('sv-'+id).textContent = v > 0 ? '+'+v : v;
+    document.getElementById('tp-'+id).textContent = LABELS[id]+' · '+(v > 0 ? '+'+v : v);
+  });
+
+  const ax = document.getElementById('axouter');
+  const W = ax.offsetWidth || 560;
+  const cx = W / 2;
+  const sc = W / 14;
+  document.getElementById('azero').style.left = cx+'px';
+
+  TEAMS.forEach(id => {
+    const v = vals[id];
+    const seg = document.getElementById('seg-'+id);
+    const w = Math.abs(v) * sc;
+    seg.style.width = w+'px';
+    seg.style.left = (v >= 0 ? cx : cx - w)+'px';
+  });
+
+  const net = TEAMS.reduce((s,id) => s + vals[id], 0);
+  const mkx = Math.max(8, Math.min(W-8, cx + net * sc));
+  const mk = document.getElementById('amk');
+  mk.style.left = mkx+'px';
+  mk.style.background = net > 0 ? '#064262' : net < 0 ? '#0B4349' : '#929D90';
+
+  const sorted = [...TEAMS].sort((a,b) => Math.abs(vals[b]) - Math.abs(vals[a]));
+  const rchips = document.getElementById('rchips');
+  rchips.innerHTML = '';
+  sorted.forEach((id, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'rank-chip';
+    chip.style.cssText = `background:${CHIP_BG[id]};color:${CHIP_CL[id]}`;
+    chip.textContent = (i+1)+'º '+LABELS[id]+' (|'+Math.abs(vals[id])+'|)';
+    rchips.appendChild(chip);
+    if (i < 3) {
+      const sep = document.createElement('span');
+      sep.className = 'rank-sep';
+      sep.textContent = '>';
+      rchips.appendChild(sep);
+    }
+  });
+}
+
+TEAMS.forEach(id => {
+  document.getElementById('sl-'+id).addEventListener('input', updateDisp);
+});
+updateDisp();
+</script>
+</body>
+</html>
